@@ -9,6 +9,7 @@ use Laravel\Passport\Events\AccessTokenCreated;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
@@ -53,7 +54,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
     {
-        $this->database->table('oauth_access_tokens')->insert([
+        DB::table('oauth_access_tokens')->insert([
             'id' => $id = $accessTokenEntity->getIdentifier(),
             'user_id' => $userId = $accessTokenEntity->getUserIdentifier(),
             'client_id' => $clientId = $accessTokenEntity->getClient()->getIdentifier(),
@@ -72,7 +73,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function revokeAccessToken($tokenId)
     {
-        $this->database->table('oauth_access_tokens')
+        DB::table('oauth_access_tokens')
                     ->where('id', $tokenId)->update(['revoked' => true]);
     }
 
@@ -81,7 +82,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function isAccessTokenRevoked($tokenId)
     {
-        return ! $this->database->table('oauth_access_tokens')
+        return ! DB::table('oauth_access_tokens')
                     ->where('id', $tokenId)->where('revoked', false)->exists();
     }
 }

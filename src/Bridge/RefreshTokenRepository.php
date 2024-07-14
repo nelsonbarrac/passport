@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Laravel\Passport\Events\RefreshTokenCreated;
 use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 {
@@ -49,7 +50,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
     {
-        $this->database->table('oauth_refresh_tokens')->insert([
+        DB::table('oauth_refresh_tokens')->insert([
             'id' => $id = $refreshTokenEntity->getIdentifier(),
             'access_token_id' => $accessTokenId = $refreshTokenEntity->getAccessToken()->getIdentifier(),
             'revoked' => false,
@@ -64,7 +65,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function revokeRefreshToken($tokenId)
     {
-        $this->database->table('oauth_refresh_tokens')
+        DB::table('oauth_refresh_tokens')
                     ->where('id', $tokenId)->update(['revoked' => true]);
     }
 
@@ -73,7 +74,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function isRefreshTokenRevoked($tokenId)
     {
-        return $this->database->table('oauth_refresh_tokens')
+        return DB::table('oauth_refresh_tokens')
                     ->where('id', $tokenId)->where('revoked', true)->exists();
     }
 }
